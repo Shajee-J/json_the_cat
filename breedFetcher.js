@@ -1,24 +1,31 @@
 const request = require("request")
-const breedName = process.argv[2];
-
-request((`https://api.thecatapi.com/v1/breeds/search?name=${breedName}`), (error, response, body) => {
-
-  if (error) {
-    console.log("request failed")
-    return;
-  }
-
-  const data = JSON.parse(body);
-
-  if (data.length === 0) {
-    console.log('the requested breed is not found.')
-    return;
-  }
-
-  // console.log(data)
-  console.log(data[0].description);
 
 
-});
 
+
+const fetchBreedDescription = function (breedName, callback) {
+  request((`https://api.thecatapi.com/v1/breeds/search?name=${breedName}`), (error, response, body) => {
+    let data = null;
+    try {
+      data = JSON.parse(body);
+    }
+    catch {
+      if (error) {
+        callback("request failed")
+        return;
+      }
+    }
+    if (data.length === 0) {
+      callback('the requested breed is not found.')
+      return;
+    }
+    if (data && data[0]) {
+      // console.log(data)
+      callback(error, data[0].description);
+    }
+  })
+};
+
+
+module.exports = { fetchBreedDescription }
 
